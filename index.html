@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌟 Morsalin's About Me Chatbot 🌟</title>
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      padding: 20px;
+    }
+    #chat {
+      background: #1f1f38;
+      width: 600px;
+      max-width: 95vw;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 1.2rem;
+    }
+    #chat h2 {
+      background: #5a4fcf;
+      margin: 0;
+      padding: 20px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 2rem;
+      letter-spacing: 1.2px;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(90,79,207,0.6);
+    }
+    #conversation {
+      flex-grow: 1;
+      background: #2a2a50;
+      padding: 25px 30px;
+      overflow-y: auto;
+      border-bottom: 4px solid #5a4fcf;
+      font-size: 1.15rem;
+      line-height: 1.5;
+    }
+    .user, .bot {
+      margin: 15px 0;
+      max-width: 80%;
+      padding: 15px 20px;
+      border-radius: 30px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .user {
+      background: #667eea;
+      align-self: flex-end;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(102,126,234,0.6);
+    }
+    .bot {
+      background: #9f8ede;
+      align-self: flex-start;
+      color: #1f1f38;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(159,142,222,0.6);
+    }
+    #input-area {
+      background: #29294d;
+      padding: 20px 30px;
+      display: flex;
+      gap: 15px;
+    }
+    #userInput {
+      flex-grow: 1;
+      font-size: 1.2rem;
+      padding: 15px 20px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      background: #4b4b82;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    #userInput::placeholder {
+      color: #bbb;
+      font-style: italic;
+    }
+    #userInput:focus {
+      background: #5a4fcf;
+      color: white;
+      box-shadow: 0 0 8px #5a4fcf;
+    }
+    button {
+      background: #5a4fcf;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 0 30px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 15px rgba(90,79,207,0.6);
+      user-select: none;
+    }
+    button:hover {
+      background: #7a6ae9;
+      box-shadow: 0 6px 20px rgba(122,106,233,0.8);
+    }
+
+    /* Scrollbar styling */
+    #conversation::-webkit-scrollbar {
+      width: 8px;
+    }
+    #conversation::-webkit-scrollbar-track {
+      background: #2a2a50;
+    }
+    #conversation::-webkit-scrollbar-thumb {
+      background: #5a4fcf;
+      border-radius: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 650px) {
+      #chat {
+        width: 100%;
+        font-size: 1rem;
+      }
+      #chat h2 {
+        font-size: 1.6rem;
+      }
+      #userInput, button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat" role="main" aria-label="Chatbot conversation">
+    <h2>🤖 Morsalin's About Me Chatbot</h2>
+    <div id="conversation" tabindex="0" aria-live="polite" aria-atomic="false"></div>
+    <div id="input-area">
+      <input
+        type="text"
+        id="userInput"
+        aria-label="User question input"
+        placeholder="Type your question here..."
+        onkeydown="checkEnter(event)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button onclick="getResponse()" aria-label="Send question">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const info = {
+      "what is your name?": "My name is Morsalin Hosain Dip.",
+      "where do you live?": "I live in Shahbazpur.",
+      "where do you study?": "I study at CUET.",
+      "what is your school name?": "Shahbazpur Bohumukhi High School.",
+      "what is your college name?": "Brahmanbaria United College.",
+      "do you have siblings?": "Yes, I have 2 brothers and 3 sisters.",
+      "what are your hobbies?": "I love programming, reading, and exploring creative ideas.",
+      "what is your coaching center name?": "Pinnacle Coaching Center.",
+      "do you have a girlfriend?": "No, I don’t give anyone attention. 😄",
+      "what is your mindset?": "I have a polite and respectful mindset with good values."
+    };
+
+    const questions = Object.keys(info);
+
+    function checkEnter(event) {
+      if (event.key === "Enter") {
+        getResponse();
+      }
+    }
+
+    function getResponse() {
+      const inputField = document.getElementById("userInput");
+      const input = inputField.value.toLowerCase().trim();
+      const chat = document.getElementById("conversation");
+
+      if (input === "") return;
+
+      chat.innerHTML += `<div class="user" role="article" aria-label="User question">You: ${escapeHtml(input)}</div>`;
+      inputField.value = "";
+      chat.scrollTop = chat.scrollHeight;
+
+      const botTyping = document.createElement("div");
+      botTyping.className = "bot";
+      botTyping.innerText = "Bot is typing...";
+      chat.appendChild(botTyping);
+      chat.scrollTop = chat.scrollHeight;
+
+      setTimeout(() => {
+        botTyping.remove();
+        let response = "";
+
+        if (input === "help") {
+          response = "Here are some questions you can ask:<br>" +
+            questions.map(q => `• ${escapeHtml(q)}`).join("<br>");
+        } else if (info[input]) {
+          response = info[input];
+        } else {
+          const match = findSimilar(input);
+          if (match) {
+            response = info[match];
+          } else {
+            response = "Sorry, I don't know that. Type 'help' to see available questions.";
+          }
+        }
+
+        typeBotResponse(response, chat);
+      }, 700);
+    }
+
+    function findSimilar(userText) {
+      let closest = null;
+      let shortest = Infinity;
+      for (let key of questions) {
+        let distance = levenshtein(userText, key);
+        if (distance < shortest && distance <= 5) {
+          shortest = distance;
+          closest = key;
+        }
+      }
+      return closest;
+    }
+
+    function levenshtein(a, b) {
+      const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+      for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+      for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return matrix[a.length][b.length];
+    }
+
+    function typeBotResponse(text, chat) {
+      const botDiv = document.createElement("div");
+      botDiv.className = "bot";
+      chat.appendChild(botDiv);
+
+      let index = 0;
+      const typing = setInterval(() => {
+        if (index < text.length) {
+          botDiv.innerHTML += text.charAt(index);
+          index++;
+          chat.scrollTop = chat.scrollHeight;
+        } else {
+          clearInterval(typing);
+        }
+      }, 25);
+    }
+
+    // Escape HTML for security
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
+
